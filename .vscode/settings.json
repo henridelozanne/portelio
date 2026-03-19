@@ -1,4 +1,7 @@
 {
   "css.lint.unknownAtRules": "ignore",
-  "tailwindCSS.experimental.configFile": "app/assets/css/main.css"
+  "tailwindCSS.experimental.configFile": "app/assets/css/main.css",
+  "deno.enablePaths": ["supabase/functions"],
+  "deno.lint": true,
+  "deno.unstable": []
 }

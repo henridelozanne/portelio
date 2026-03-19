@@ -11,6 +11,24 @@ async function getSupabase() {
   return supabaseInstance;
 }
 
+// Ensure a row exists in public.users for the given auth user id.
+// Uses upsert so it's safe to call on every app start.
+async function ensurePublicUser(
+  supabase: any,
+  authUserId: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("users")
+    .upsert(
+      { auth_id: authUserId, username: "" },
+      { onConflict: "auth_id", ignoreDuplicates: true },
+    );
+
+  if (error) {
+    console.error("[Auth] ensurePublicUser failed:", error);
+  }
+}
+
 export function useAuth() {
   const userId = ref<string | null>(null);
   const isLoading = ref(false);
@@ -39,8 +57,10 @@ export function useAuth() {
           throw new Error("Failed to get user ID after anonymous sign in");
 
         userId.value = user.id;
+        await ensurePublicUser(supabase, user.id);
       } else {
         userId.value = session.user.id;
+        await ensurePublicUser(supabase, session.user.id);
       }
     } catch (e) {
       error.value = e instanceof Error ? e : new Error("Unknown auth error");

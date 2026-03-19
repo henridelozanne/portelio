@@ -1,18 +1,10 @@
 @import "tailwindcss";
-
-@theme {
-  --color-cream: #faf9f6;
-  --color-accent: #e8926b;
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue",
-    sans-serif;
-  --max-width-app: 480px;
-}
+@import "./variables.css";
 
 @layer base {
   html,
   body {
-    @apply bg-cream text-[#1a1a1a];
+    @apply bg-cream text-ink;
     -webkit-font-smoothing: antialiased;
     overscroll-behavior: none;
   }
@@ -30,5 +22,15 @@
   }
   .pr-safe {
     padding-right: env(safe-area-inset-right);
+  }
+}
+
+@layer components {
+  .invite-btn {
+    @apply flex items-center justify-center gap-2
+           bg-accent text-white font-semibold text-base
+           rounded-2xl py-4 px-6
+           active:scale-[0.97] transition-transform
+           disabled:opacity-60 disabled:pointer-events-none;
   }
 }

@@ -1,0 +1,20 @@
+@theme {
+  /* Palette */
+  --color-cream: #faf9f6; /* Fond principal */
+  --color-surface: #f0eee9; /* Fond secondaire, cartes, inputs */
+  --color-accent: #e8926b; /* CTA, badges, icônes principales */
+  --color-ink: #1a1a1a; /* Texte principal */
+  --color-muted: #9a8f87; /* Texte secondaire, placeholders */
+  --color-subtle: #c8bfb8; /* Icônes légères, séparateurs */
+  --color-card: #ffffff; /* Fond de carte/modal */
+  --color-on-dark: #ffffff; /* Texte sur fond sombre (photo, bg-ink) */
+  --color-overlay: #000000; /* Gradient overlay sur photos */
+
+  /* Typo */
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue",
+    sans-serif;
+
+  /* Layout */
+  --max-width-app: 480px;
+}

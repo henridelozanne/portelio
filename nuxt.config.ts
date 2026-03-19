@@ -6,7 +6,19 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
   devtools: { enabled: true },
 
-  modules: [],
+  modules: ["@nuxtjs/i18n"],
+
+  i18n: {
+    locales: [{ code: "en", language: "en-US", file: "en.json" }],
+    defaultLocale: "en",
+    strategy: "no_prefix",
+    langDir: "locales",
+  },
+
+  components: [
+    { path: "~/components", pathPrefix: true },
+    { path: "~/components/icons", pathPrefix: false },
+  ],
 
   vite: {
     plugins: [tailwindcss()],
