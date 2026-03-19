@@ -1,5 +1,3 @@
 <template>
-  <main>
-    <h1>Portelio</h1>
-  </main>
+  <main></main>
 </template>

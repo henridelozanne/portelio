@@ -6,14 +6,13 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
   devtools: { enabled: true },
 
-  modules: ["@nuxtjs/supabase"],
+  modules: [],
 
   vite: {
     plugins: [tailwindcss()],
-  },
-
-  supabase: {
-    redirect: false,
+    optimizeDeps: {
+      include: ["@supabase/supabase-js"],
+    },
   },
 
   css: ["~/assets/css/main.css"],
