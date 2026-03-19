@@ -12,7 +12,6 @@ export default {
     invite_loading: "Generating link…",
     pair_limit_error:
       "You've reached your pair limit. Upgrade to Premium to add more.",
-    generic_error: "Something went wrong. Please try again.",
     no_photo_yet: "No photo yet ✨",
     sent_today: "Sent ✓",
     to_send: "To send",

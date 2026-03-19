@@ -45,23 +45,33 @@ export function useAuth() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (!session) {
-        // No existing session — sign in anonymously
-        const {
-          data: { user },
-          error: signInError,
-        } = await supabase.auth.signInAnonymously();
-
-        if (signInError) throw signInError;
-        if (!user?.id)
-          throw new Error("Failed to get user ID after anonymous sign in");
-
-        userId.value = user.id;
-        await ensurePublicUser(supabase, user.id);
-      } else {
+      if (session?.user) {
         userId.value = session.user.id;
         await ensurePublicUser(supabase, session.user.id);
+        return;
       }
+
+      const {
+        data: { user: serverUser },
+      } = await supabase.auth.getUser();
+
+      if (serverUser) {
+        userId.value = serverUser.id;
+        await ensurePublicUser(supabase, serverUser.id);
+        return;
+      }
+
+      const {
+        data: { user },
+        error: signInError,
+      } = await supabase.auth.signInAnonymously();
+
+      if (signInError) throw signInError;
+      if (!user?.id)
+        throw new Error("Failed to get user ID after anonymous sign in");
+
+      userId.value = user.id;
+      await ensurePublicUser(supabase, user.id);
     } catch (e) {
       error.value = e instanceof Error ? e : new Error("Unknown auth error");
       console.error("[Auth] initAuth failed:", error.value);

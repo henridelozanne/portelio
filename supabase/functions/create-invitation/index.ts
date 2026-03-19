@@ -3,23 +3,24 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const PAIR_LIMIT_FREE = 1;
 const PAIR_LIMIT_PREMIUM = 5;
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+};
+
+function json(body: unknown, status = 200) {
+  return Response.json(body, { status, headers: CORS_HEADERS });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "authorization, content-type",
-      },
-    });
+    return new Response(null, { headers: CORS_HEADERS });
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return Response.json(
-        { error: "Missing authorization header" },
-        { status: 401 },
-      );
+      return json({ error: "Missing authorization header" }, 401);
     }
 
     const supabase = createClient(
@@ -40,21 +41,33 @@ Deno.serve(async (req) => {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return json({ error: "Unauthorized" }, 401);
     }
 
-    // Get the public user row
-    const { data: publicUser, error: userError } = await supabase
+    // Get or create the public user row (admin bypasses RLS)
+    const { data: upsertedUser, error: upsertError } = await adminClient
       .from("users")
+      .upsert(
+        { auth_id: user.id, username: "" },
+        { onConflict: "auth_id", ignoreDuplicates: true },
+      )
       .select("id, is_premium")
-      .eq("auth_id", user.id)
-      .single();
+      .maybeSingle();
 
-    if (userError || !publicUser) {
-      return Response.json(
-        { error: "User profile not found" },
-        { status: 404 },
-      );
+    const publicUser =
+      upsertedUser ??
+      (await (async () => {
+        const { data } = await adminClient
+          .from("users")
+          .select("id, is_premium")
+          .eq("auth_id", user.id)
+          .single();
+        return data;
+      })());
+
+    if (!publicUser) {
+      console.error("[create-invitation] upsertError:", upsertError);
+      return json({ error: "Failed to create user profile" }, 500);
     }
 
     // Count existing pairs for this user
@@ -64,14 +77,14 @@ Deno.serve(async (req) => {
       .or(`user_a_id.eq.${publicUser.id},user_b_id.eq.${publicUser.id}`);
 
     if (pairError) {
-      return Response.json({ error: "Failed to count pairs" }, { status: 500 });
+      return json({ error: "Failed to count pairs" }, 500);
     }
 
     const limit = publicUser.is_premium ? PAIR_LIMIT_PREMIUM : PAIR_LIMIT_FREE;
     if ((pairCount ?? 0) >= limit) {
-      return Response.json(
+      return json(
         { error: "pair_limit_reached", isPremium: publicUser.is_premium },
-        { status: 403 },
+        403,
       );
     }
 
@@ -86,7 +99,7 @@ Deno.serve(async (req) => {
 
     if (existingInvite) {
       const deepLink = `portelio://invite/${existingInvite.token}`;
-      return Response.json({ token: existingInvite.token, deepLink });
+      return json({ token: existingInvite.token, deepLink });
     }
 
     // Create a new invitation
@@ -97,16 +110,13 @@ Deno.serve(async (req) => {
       .single();
 
     if (inviteError || !invitation) {
-      return Response.json(
-        { error: "Failed to create invitation" },
-        { status: 500 },
-      );
+      return json({ error: "Failed to create invitation" }, 500);
     }
 
     const deepLink = `portelio://invite/${invitation.token}`;
-    return Response.json({ token: invitation.token, deepLink });
+    return json({ token: invitation.token, deepLink });
   } catch (err) {
     console.error("[create-invitation] unexpected error:", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return json({ error: "Internal server error" }, 500);
   }
 });

@@ -5,10 +5,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const { initAuth } = useAuth();
-
-onMounted(() => {
-  initAuth();
-});
-</script>
+<script setup lang="ts"></script>

@@ -95,13 +95,15 @@ import { Share } from "@capacitor/share";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const { initAuth } = useAuth();
 const router = useRouter();
 const { pairs, isLoading, fetchPairs, createInvitation } = usePairs();
 
 const isInviting = ref(false);
 const inviteError = ref<string | null>(null);
 
-onMounted(() => {
+onMounted(async () => {
+  await initAuth();
   fetchPairs();
 });
 
@@ -130,7 +132,7 @@ async function handleInvite() {
       inviteError.value = t("home.pair_limit_error");
     } else if (e?.errorMessage !== "Share canceled") {
       // Ignore user-cancelled share sheet
-      inviteError.value = t("home.generic_error");
+      inviteError.value = t("invite.generic_error");
     }
   } finally {
     isInviting.value = false;

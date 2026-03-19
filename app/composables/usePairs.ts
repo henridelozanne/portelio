@@ -46,11 +46,11 @@ export function usePairs() {
     try {
       const supabase = await getSupabase();
 
-      // Get the current user's public id
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.user) throw new Error("Not authenticated");
+      const user = session.user;
 
       const { data: me, error: meError } = await supabase
         .from("users")
