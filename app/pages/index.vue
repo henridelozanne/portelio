@@ -38,6 +38,9 @@
           <p class="text-muted text-base leading-relaxed">
             {{ $t("home.empty.body") }}
           </p>
+          <p class="text-muted text-base leading-relaxed">
+            {{ $t("home.empty.body2") }}
+          </p>
         </div>
         <button class="invite-btn" :disabled="isInviting" @click="handleInvite">
           <span v-if="isInviting">{{ $t("home.invite_loading") }}</span>
@@ -89,6 +92,7 @@
 
 <script setup lang="ts">
 import { Share } from "@capacitor/share";
+import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const router = useRouter();

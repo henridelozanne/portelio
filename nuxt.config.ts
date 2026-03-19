@@ -6,14 +6,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
   devtools: { enabled: true },
 
-  modules: ["@nuxtjs/i18n"],
-
-  i18n: {
-    locales: [{ code: "en", language: "en-US", file: "en.json" }],
-    defaultLocale: "en",
-    strategy: "no_prefix",
-    langDir: "locales",
-  },
+  modules: [],
 
   components: [
     { path: "~/components", pathPrefix: true },
