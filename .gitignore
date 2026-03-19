@@ -23,3 +23,4 @@ ios/App/Pods/
 ios/App/build/
 
 supabase/.temp/
+dist/

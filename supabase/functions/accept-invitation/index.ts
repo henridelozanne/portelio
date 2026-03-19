@@ -1,22 +1,23 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, content-type",
+};
+
+function json(body: unknown, status = 200) {
+  return Response.json(body, { status, headers: CORS_HEADERS });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Headers": "authorization, content-type",
-      },
-    });
+    return new Response(null, { headers: CORS_HEADERS });
   }
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return Response.json(
-        { error: "Missing authorization header" },
-        { status: 401 },
-      );
+      return json({ error: "Missing authorization header" }, 401);
     }
 
     const supabase = createClient(
@@ -36,20 +37,17 @@ Deno.serve(async (req) => {
       error: authError,
     } = await supabase.auth.getUser();
     if (authError || !user) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      return json({ error: "Unauthorized" }, 401);
     }
 
     const { token } = await req.json();
     if (!token || typeof token !== "string") {
-      return Response.json(
-        { error: "Missing or invalid token" },
-        { status: 400 },
-      );
+      return json({ error: "Missing or invalid token" }, 400);
     }
 
     // Sanitize: token should be a 32-char hex string
     if (!/^[a-f0-9]{32}$/.test(token)) {
-      return Response.json({ error: "Invalid token format" }, { status: 400 });
+      return json({ error: "Invalid token format" }, 400);
     }
 
     // Fetch the invitation
@@ -60,14 +58,11 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (inviteError || !invitation) {
-      return Response.json({ error: "Invitation not found" }, { status: 404 });
+      return json({ error: "Invitation not found" }, 404);
     }
 
     if (invitation.status !== "pending") {
-      return Response.json(
-        { error: "invitation_already_used" },
-        { status: 409 },
-      );
+      return json({ error: "invitation_already_used" }, 409);
     }
 
     if (new Date(invitation.expires_at) < new Date()) {
@@ -76,7 +71,7 @@ Deno.serve(async (req) => {
         .from("invitations")
         .update({ status: "expired" })
         .eq("id", invitation.id);
-      return Response.json({ error: "invitation_expired" }, { status: 410 });
+      return json({ error: "invitation_expired" }, 410);
     }
 
     // Get the accepter's public user row
@@ -87,18 +82,12 @@ Deno.serve(async (req) => {
       .single();
 
     if (accepterError || !accepter) {
-      return Response.json(
-        { error: "Accepter profile not found" },
-        { status: 404 },
-      );
+      return json({ error: "Accepter profile not found" }, 404);
     }
 
     // Prevent self-pairing
     if (accepter.id === invitation.inviter_id) {
-      return Response.json(
-        { error: "Cannot pair with yourself" },
-        { status: 400 },
-      );
+      return json({ error: "Cannot pair with yourself" }, 400);
     }
 
     // Check if a pair already exists between these two users
@@ -111,7 +100,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existingPair) {
-      return Response.json({ error: "pair_already_exists" }, { status: 409 });
+      return json({ error: "pair_already_exists" }, 409);
     }
 
     // Create the pair + mark invitation as accepted — atomically via DB transaction
@@ -122,7 +111,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (pairError || !pair) {
-      return Response.json({ error: "Failed to create pair" }, { status: 500 });
+      return json({ error: "Failed to create pair" }, 500);
     }
 
     const { error: updateError } = await adminClient
@@ -138,9 +127,9 @@ Deno.serve(async (req) => {
       // Pair is created, not critical — log but don't fail
     }
 
-    return Response.json({ pairId: pair.id });
+    return json({ pairId: pair.id });
   } catch (err) {
     console.error("[accept-invitation] unexpected error:", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
+    return json({ error: "Internal server error" }, 500);
   }
 });

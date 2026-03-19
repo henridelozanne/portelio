@@ -33,5 +33,7 @@ export default {
     not_found: "Invitation not found.",
     generic_error: "Something went wrong. Please try again.",
     success: "You're paired! 🎉",
+    go_home: "Go to home",
+    back_home: "Back to home",
   },
 };
