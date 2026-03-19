@@ -9,6 +9,9 @@ android/
 *.log
 .DS_Store
 
+# Plan d'implémentation (privé)
+PLAN.md
+
 # Capacitor dev config (ne jamais commiter avec server.url actif)
 capacitor.config.dev.json
 

@@ -2,13 +2,16 @@
 
 @theme {
   --color-cream: #faf9f6;
-  --color-accent: #E8926B;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'Helvetica Neue', sans-serif;
+  --color-accent: #e8926b;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Helvetica Neue",
+    sans-serif;
   --max-width-app: 480px;
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply bg-cream text-[#1a1a1a];
     -webkit-font-smoothing: antialiased;
     padding-left: env(safe-area-inset-left);
