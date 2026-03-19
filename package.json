@@ -1,0 +1,35 @@
+{
+  "name": "portelio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "cap:sync": "npm run build && npx cap sync ios",
+    "cap:open": "npx cap open ios",
+    "cap:run": "npx cap run ios",
+    "dev:ios": "mkdir -p .output/public && CAP_DEV=true npx cap run ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/camera": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/local-notifications": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@nuxtjs/supabase": "^1.5.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "nuxt": "^3.16.0",
+    "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "typescript": "^5.8.2",
+    "unstorage": "^1.17.4",
+    "vue-tsc": "^2.2.8"
+  }
+}

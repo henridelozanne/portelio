@@ -1,0 +1,21 @@
+node_modules/
+.nuxt/
+.output/
+dist/
+android/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+
+# Capacitor dev config (ne jamais commiter avec server.url actif)
+capacitor.config.dev.json
+
+# ios/ est volontairement tracké en git (contient le code Swift natif : Widget Extension, plugins)
+# Fichiers Xcode ignorés :
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/Pods/
+ios/App/build/
+
