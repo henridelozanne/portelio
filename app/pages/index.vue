@@ -123,8 +123,7 @@ async function handleInvite() {
     const { deepLink } = await createInvitation();
     await Share.share({
       title: t("home.title"),
-      text: t("invite.body"),
-      url: deepLink,
+      text: `${t("invite.body")}\n${deepLink}`,
       dialogTitle: t("home.invite_cta"),
     });
   } catch (e: any) {
